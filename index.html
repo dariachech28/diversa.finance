@@ -1,9 +1,816 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Coming Soon</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Diversa — Onchain Capital Allocator</title>
+  <meta
+    name="description"
+    content="Diversa is an onchain capital allocator built for efficient, transparent, and programmable capital deployment."
+  />
+  <style>
+    :root {
+      --bg: #07090d;
+      --bg-soft: rgba(255, 255, 255, 0.04);
+      --card: rgba(255, 255, 255, 0.06);
+      --card-strong: rgba(255, 255, 255, 0.08);
+      --text: #f4f7fb;
+      --muted: #9aa4b2;
+      --line: rgba(255, 255, 255, 0.10);
+      --accent: #7c9cff;
+      --accent-2: #8ef0d0;
+      --shadow: 0 20px 80px rgba(0, 0, 0, 0.45);
+      --radius: 24px;
+      --radius-sm: 16px;
+      --max: 1180px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(124, 156, 255, 0.18), transparent 30%),
+        radial-gradient(circle at 80% 30%, rgba(142, 240, 208, 0.10), transparent 28%),
+        radial-gradient(circle at 50% 80%, rgba(124, 156, 255, 0.08), transparent 35%),
+        var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 44px 44px;
+      mask-image: radial-gradient(circle at center, black 35%, transparent 80%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .container {
+      width: min(var(--max), calc(100% - 32px));
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 0;
+      position: sticky;
+      top: 0;
+      backdrop-filter: blur(14px);
+      background: rgba(7, 9, 13, 0.55);
+      z-index: 10;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 600;
+      letter-spacing: 0.2px;
+    }
+
+    .brand-mark {
+      width: 34px;
+      height: 34px;
+      border-radius: 12px;
+      background:
+        linear-gradient(135deg, rgba(124, 156, 255, 0.95), rgba(142, 240, 208, 0.9));
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.35),
+        0 10px 30px rgba(124, 156, 255, 0.35);
+      position: relative;
+    }
+
+    .brand-mark::after {
+      content: "";
+      position: absolute;
+      inset: 7px;
+      border-radius: 9px;
+      border: 1px solid rgba(255,255,255,0.5);
+      opacity: 0.9;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .nav-links a:hover {
+      color: var(--text);
+    }
+
+    .nav-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .btn {
+      appearance: none;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 12px 18px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 180ms ease;
+      backdrop-filter: blur(12px);
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      border-color: rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.07);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #071019;
+      border: 0;
+      box-shadow: 0 10px 30px rgba(124, 156, 255, 0.25);
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.03);
+    }
+
+    .hero {
+      padding: 72px 0 56px;
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 28px;
+      align-items: stretch;
+    }
+
+    .hero-copy,
+    .hero-card,
+    .info-card,
+    .metric,
+    .footer-card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .hero-copy {
+      padding: 36px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-copy::before {
+      content: "";
+      position: absolute;
+      width: 360px;
+      height: 360px;
+      right: -120px;
+      top: -120px;
+      background: radial-gradient(circle, rgba(124,156,255,0.18), transparent 65%);
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 10px 14px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.03);
+    }
+
+    .eyebrow-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      box-shadow: 0 0 18px rgba(124, 156, 255, 0.7);
+    }
+
+    h1 {
+      margin: 22px 0 16px;
+      font-size: clamp(42px, 8vw, 84px);
+      line-height: 0.95;
+      letter-spacing: -0.04em;
+      max-width: 9ch;
+    }
+
+    .hero-copy p {
+      margin: 0;
+      max-width: 600px;
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1.7;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 14px;
+      margin-top: 28px;
+      flex-wrap: wrap;
+    }
+
+    .hero-foot {
+      display: flex;
+      gap: 26px;
+      margin-top: 34px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .hero-foot strong {
+      display: block;
+      color: var(--text);
+      font-size: 18px;
+      margin-bottom: 4px;
+    }
+
+    .hero-card {
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 100%;
+    }
+
+    .panel {
+      background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.035));
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 22px;
+      padding: 20px;
+    }
+
+    .panel-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .pill {
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--line);
+    }
+
+    .big-number {
+      font-size: clamp(36px, 6vw, 56px);
+      line-height: 1;
+      letter-spacing: -0.04em;
+      margin: 0 0 10px;
+    }
+
+    .subtext {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .chart {
+      margin: 22px 0 18px;
+      height: 180px;
+      position: relative;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.06);
+      background:
+        linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px),
+        linear-gradient(180deg, rgba(124,156,255,0.08), rgba(142,240,208,0.03));
+      background-size: 100% 33.33%, 16.66% 100%, auto;
+      overflow: hidden;
+    }
+
+    .chart svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .allocation-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      font-size: 14px;
+    }
+
+    .allocation-row:last-child {
+      border-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .allocation-name {
+      color: var(--text);
+    }
+
+    .allocation-meta {
+      color: var(--muted);
+    }
+
+    .wallet-box {
+      margin-top: 18px;
+      padding: 16px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.07);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .wallet-status {
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .wallet-status strong {
+      color: var(--text);
+    }
+
+    .section {
+      padding: 14px 0 56px;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .section-head h2 {
+      margin: 0;
+      font-size: clamp(28px, 5vw, 44px);
+      letter-spacing: -0.03em;
+    }
+
+    .section-head p {
+      margin: 0;
+      color: var(--muted);
+      max-width: 520px;
+      line-height: 1.7;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .info-card {
+      padding: 24px;
+    }
+
+    .info-card h3 {
+      margin: 0 0 10px;
+      font-size: 20px;
+      letter-spacing: -0.02em;
+    }
+
+    .info-card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 15px;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-top: 18px;
+    }
+
+    .metric {
+      padding: 22px;
+    }
+
+    .metric .label {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .metric .value {
+      font-size: 32px;
+      line-height: 1;
+      letter-spacing: -0.03em;
+      margin-bottom: 8px;
+    }
+
+    .metric .detail {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .cta {
+      padding: 20px 0 72px;
+    }
+
+    .footer-card {
+      padding: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .footer-copy h3 {
+      margin: 0 0 8px;
+      font-size: 28px;
+      letter-spacing: -0.03em;
+    }
+
+    .footer-copy p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 620px;
+    }
+
+    .footer-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .notice {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .tagline {
+      display: inline-block;
+      background: linear-gradient(135deg, #ffffff, #9ab4ff 55%, #9cf0d8);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    @media (max-width: 1024px) {
+      .hero {
+        grid-template-columns: 1fr;
+      }
+
+      .grid-3,
+      .metrics {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .nav {
+        padding: 16px 0;
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      .hero-copy,
+      .hero-card,
+      .info-card,
+      .metric,
+      .footer-card {
+        border-radius: 20px;
+      }
+
+      .hero-copy,
+      .hero-card,
+      .info-card,
+      .metric,
+      .footer-card,
+      .panel {
+        padding-left: 18px;
+        padding-right: 18px;
+      }
+
+      .grid-3,
+      .metrics {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        max-width: none;
+      }
+
+      .section-head {
+        align-items: start;
+        flex-direction: column;
+      }
+    }
+  </style>
 </head>
-<body style="text-align:center; font-family:sans-serif; margin-top:20%;">
-  <h1>My Site is Coming Soon</h1>
+<body>
+  <div class="container">
+    <header class="nav">
+      <a href="#" class="brand" aria-label="Diversa home">
+        <span class="brand-mark"></span>
+        <span>Diversa</span>
+      </a>
+
+      <nav class="nav-links" aria-label="Main navigation">
+        <a href="#about">About</a>
+        <a href="#allocator">Allocator</a>
+        <a href="#metrics">Metrics</a>
+      </nav>
+
+      <div class="nav-actions">
+        <button class="btn" id="connectWalletBtnTop">Connect Wallet</button>
+        <button class="btn btn-primary" id="depositBtnTop">Deposit</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero" id="allocator">
+        <div class="hero-copy">
+          <div class="eyebrow">
+            <span class="eyebrow-dot"></span>
+            <span>Onchain capital allocator</span>
+          </div>
+
+          <h1>
+            Capital allocation,
+            <span class="tagline">redefined onchain.</span>
+          </h1>
+
+          <p>
+            Diversa is a minimal interface for programmable capital deployment:
+            transparent, efficient, and built for modern onchain markets.
+          </p>
+
+          <div class="hero-actions">
+            <button class="btn btn-primary" id="connectWalletBtnHero">Connect Wallet</button>
+            <button class="btn" id="depositBtnHero">Deposit</button>
+          </div>
+
+          <div class="hero-foot">
+            <div>
+              <strong>Transparent</strong>
+              verifiable flows and onchain execution
+            </div>
+            <div>
+              <strong>Efficient</strong>
+              capital routed with clarity and precision
+            </div>
+            <div>
+              <strong>Minimal</strong>
+              clean interface, institutional feel
+            </div>
+          </div>
+        </div>
+
+        <aside class="hero-card">
+          <div class="panel">
+            <div class="panel-top">
+              <span>Allocator Overview</span>
+              <span class="pill">Live Preview</span>
+            </div>
+
+            <div class="big-number">$24.8M</div>
+            <div class="subtext">Simulated capital allocated across onchain strategies.</div>
+
+            <div class="chart" aria-hidden="true">
+              <svg viewBox="0 0 600 220" preserveAspectRatio="none">
+                <defs>
+                  <linearGradient id="lineGlow" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#7c9cff" />
+                    <stop offset="100%" stop-color="#8ef0d0" />
+                  </linearGradient>
+                  <linearGradient id="fillGlow" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stop-color="rgba(124,156,255,0.32)" />
+                    <stop offset="100%" stop-color="rgba(124,156,255,0)" />
+                  </linearGradient>
+                </defs>
+                <path
+                  d="M0,170 C40,168 60,156 95,144 C125,134 150,138 185,116 C220,94 245,102 280,88 C325,70 350,82 390,64 C430,46 470,56 515,34 C546,20 570,26 600,14 L600,220 L0,220 Z"
+                  fill="url(#fillGlow)"
+                ></path>
+                <path
+                  d="M0,170 C40,168 60,156 95,144 C125,134 150,138 185,116 C220,94 245,102 280,88 C325,70 350,82 390,64 C430,46 470,56 515,34 C546,20 570,26 600,14"
+                  fill="none"
+                  stroke="url(#lineGlow)"
+                  stroke-width="4"
+                  stroke-linecap="round"
+                ></path>
+              </svg>
+            </div>
+
+            <div class="allocation-row">
+              <span class="allocation-name">Stable Yield</span>
+              <span class="allocation-meta">41%</span>
+            </div>
+            <div class="allocation-row">
+              <span class="allocation-name">Liquid Strategies</span>
+              <span class="allocation-meta">34%</span>
+            </div>
+            <div class="allocation-row">
+              <span class="allocation-name">Directional Exposure</span>
+              <span class="allocation-meta">25%</span>
+            </div>
+          </div>
+
+          <div class="wallet-box">
+            <div class="wallet-status" id="walletStatus">
+              Status: <strong>Not connected</strong>
+            </div>
+            <button class="btn btn-primary" id="connectWalletBtnCard">Connect Wallet</button>
+          </div>
+        </aside>
+      </section>
+
+      <section class="section" id="about">
+        <div class="section-head">
+          <h2>Built for disciplined deployment</h2>
+          <p>
+            Diversa presents capital allocation as a clean onchain primitive:
+            deposit, route, track, and manage exposure through a focused interface.
+          </p>
+        </div>
+
+        <div class="grid-3">
+          <div class="info-card">
+            <h3>Programmable</h3>
+            <p>
+              Capital flows can be abstracted into transparent rules, modular execution,
+              and onchain logic with a minimal operational layer.
+            </p>
+          </div>
+
+          <div class="info-card">
+            <h3>Composable</h3>
+            <p>
+              Designed to sit naturally inside modern crypto stacks, from treasury operations
+              to strategy layers and structured routing.
+            </p>
+          </div>
+
+          <div class="info-card">
+            <h3>Institutional aesthetic</h3>
+            <p>
+              A sharp, quiet interface that feels premium without visual noise:
+              minimal, dark, and focused on trust and clarity.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="metrics">
+        <div class="section-head">
+          <h2>Allocator metrics</h2>
+          <p>
+            Placeholder stats for the landing page. Later these can be replaced with real
+            onchain data, vault balances, TVL, and wallet-connected actions.
+          </p>
+        </div>
+
+        <div class="metrics">
+          <div class="metric">
+            <span class="label">Total Allocated</span>
+            <div class="value">$24.8M</div>
+            <div class="detail">Across diversified onchain deployment paths.</div>
+          </div>
+
+          <div class="metric">
+            <span class="label">Net APY</span>
+            <div class="value">8.4%</div>
+            <div class="detail">Illustrative blended yield across strategies.</div>
+          </div>
+
+          <div class="metric">
+            <span class="label">Execution Latency</span>
+            <div class="value">&lt; 1s</div>
+            <div class="detail">Designed for fast, clear user interaction.</div>
+          </div>
+
+          <div class="metric">
+            <span class="label">Strategies</span>
+            <div class="value">12</div>
+            <div class="detail">Example modular capital routing destinations.</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="cta">
+        <div class="footer-card">
+          <div class="footer-copy">
+            <h3>Diversa</h3>
+            <p>
+              Onchain capital allocator for transparent deployment, cleaner treasury workflows,
+              and a sharper user experience.
+            </p>
+            <div class="notice">
+              Demo landing page. Wallet connection and deposits are currently UI-only.
+            </div>
+          </div>
+
+          <div class="footer-actions">
+            <button class="btn" id="connectWalletBtnBottom">Connect Wallet</button>
+            <button class="btn btn-primary" id="depositBtnBottom">Deposit</button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    (function () {
+      const connectButtons = document.querySelectorAll(
+        "#connectWalletBtnTop, #connectWalletBtnHero, #connectWalletBtnCard, #connectWalletBtnBottom"
+      );
+      const depositButtons = document.querySelectorAll(
+        "#depositBtnTop, #depositBtnHero, #depositBtnBottom"
+      );
+      const walletStatus = document.getElementById("walletStatus");
+
+      let isConnected = false;
+      let walletAddress = "";
+
+      function shortenAddress(address) {
+        return address.slice(0, 6) + "..." + address.slice(-4);
+      }
+
+      function updateWalletUI() {
+        connectButtons.forEach((btn) => {
+          btn.textContent = isConnected ? "Wallet Connected" : "Connect Wallet";
+        });
+
+        walletStatus.innerHTML = isConnected
+          ? 'Status: <strong>' + shortenAddress(walletAddress) + "</strong>"
+          : 'Status: <strong>Not connected</strong>';
+      }
+
+      function fakeConnectWallet() {
+        if (isConnected) return;
+
+        walletAddress = "0xA91C4F2B73D8E64F19B2c8D1E2A7B9C3D4E5F6A7";
+        isConnected = true;
+        updateWalletUI();
+      }
+
+      function handleDeposit() {
+        if (!isConnected) {
+          alert("Connect wallet first.");
+          return;
+        }
+
+        alert("Deposit flow will be added later.");
+      }
+
+      connectButtons.forEach((btn) => {
+        btn.addEventListener("click", fakeConnectWallet);
+      });
+
+      depositButtons.forEach((btn) => {
+        btn.addEventListener("click", handleDeposit);
+      });
+
+      updateWalletUI();
+    })();
+  </script>
 </body>
 </html>
